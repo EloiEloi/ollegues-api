@@ -27,18 +27,23 @@ import colleguesapi.model.service.CollegueService;
  *
  */
 @RestController
-@RequestMapping("/collegues")
+
 public class CollegueControleur {
 
 	@Autowired
 	CollegueService c;
 
-	@RequestMapping(path = "/nom/{nom}", method = RequestMethod.GET)
+	@RequestMapping(path = "/collegues", method = RequestMethod.GET)
+	public List<Collegue> findColleguesAll() {
+		return c.rechercherTous();
+	}
+
+	@RequestMapping(path = "/collegues/nom/{nom}", method = RequestMethod.GET)
 	public List<Collegue> findColleguesByName(@PathVariable String nom) throws CollegueNonTrouveException {
 		return c.rechercherParNom(nom);
 	}
 
-	@RequestMapping(path = "/matricule/{matricule}", method = RequestMethod.GET)
+	@RequestMapping(path = "/collegues/matricule/{matricule}", method = RequestMethod.GET)
 	public Collegue findColleguesByMatricule(@PathVariable String matricule) throws CollegueNonTrouveException {
 		return c.rechercherParMatricule(matricule);
 	}
@@ -51,16 +56,9 @@ public class CollegueControleur {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bodyOfResponse);
 	}
 
-	@PostMapping("/creer")
+	@PostMapping("/collegues/creer")
 	public Collegue creerCollegue(@RequestParam String nom, @RequestParam String prenom, @RequestParam String email, @RequestParam String photo) throws CollegueInvalideException {
-		Collegue collegueAAjouter = new Collegue();
-
-		collegueAAjouter.setEmail(email);
-		collegueAAjouter.setNom(nom);
-		collegueAAjouter.setPrenom(prenom);
-		collegueAAjouter.setPhotoUrl(photo);
-
-		return c.ajouterUnCollegue(collegueAAjouter);
+		return c.ajouterUnCollegue(nom, prenom, email, photo);
 	}
 
 	@ExceptionHandler(CollegueInvalideException.class)
@@ -69,5 +67,10 @@ public class CollegueControleur {
 		responseHeaders.set("MyResponseHeader", "MyValue");
 		String bodyOfResponse = exception.getMessage();
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bodyOfResponse);
+	}
+
+	@PostMapping("/collegues/modifier")
+	public Collegue modifierEmail(@RequestParam String matricule, @RequestParam String email) throws CollegueNonTrouveException {
+		return c.modifierEmail(matricule, email);
 	}
 }
