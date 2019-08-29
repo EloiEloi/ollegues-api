@@ -26,6 +26,7 @@ public class Collegue {
 	 * Constructor
 	 * 
 	 */
+
 	public Collegue() {
 
 	}
