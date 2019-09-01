@@ -3,12 +3,15 @@
  */
 package colleguesapi.model.utils;
 
+import org.springframework.stereotype.Component;
+
 import colleguesapi.model.Collegue;
 
 /**
  * @author Eloi
  *
  */
+@Component
 public class CollegueValidator {
 
 	public static Boolean validerNom(Collegue collegueAValider) {
@@ -32,7 +35,8 @@ public class CollegueValidator {
 	// TODO Vérifier que la date de naissance correspond à un age >= 18
 
 	public static Boolean validerAll(Collegue collegueAValider) {
-		return (validerNom(collegueAValider) && validerPrenom(collegueAValider) && validerEmail(collegueAValider) && validerPhoto(collegueAValider));
+		return (validerNom(collegueAValider) && validerPrenom(collegueAValider) && validerEmail(collegueAValider)
+				&& validerPhoto(collegueAValider));
 	}
 
 }

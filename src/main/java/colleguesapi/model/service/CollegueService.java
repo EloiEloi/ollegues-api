@@ -3,20 +3,18 @@
  */
 package colleguesapi.model.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import colleguesapi.model.Collegue;
 import colleguesapi.model.exception.CollegueInvalideException;
 import colleguesapi.model.exception.CollegueNonTrouveException;
 import colleguesapi.model.utils.CollegueValidator;
-import colleguesapi.model.utils.DataUtils;
+import colleguesapi.repository.CollegueRepository;
 
 /**
  * @author Eloi
@@ -25,18 +23,15 @@ import colleguesapi.model.utils.DataUtils;
 @Service
 public class CollegueService {
 
-	private Map<String, Collegue> data = new HashMap<>();
-
-	public CollegueService() {
-		data = DataUtils.initData();
-	}
+	@Autowired
+	private CollegueRepository collegueRepository;
 
 	public List<Collegue> rechercherParNom(String nomRecherche) throws CollegueNonTrouveException {
 
-		List<Collegue> colleguesTrouves = new ArrayList<Collegue>();
+		List<Collegue> colleguesTrouves;
 
 		if (nomRecherche != "") {
-			colleguesTrouves = this.data.values().stream().filter(collegue -> collegue.getNom().equals(nomRecherche)).collect(Collectors.toList());
+			colleguesTrouves = collegueRepository.findAll();
 		} else {
 			throw new CollegueNonTrouveException("Le nom ne peut être vide");
 		}
@@ -53,8 +48,13 @@ public class CollegueService {
 
 		Collegue colleguesTrouve;
 
+		// colleguesTrouve =
+		// collegueRepository.findByMatricule(matriculeRecherche).orElseThrow(() -> new
+		// CollegueNonTrouveException("Le matricule ne
+		// peut être vide"));
+
 		if (matriculeRecherche != "") {
-			colleguesTrouve = data.get(matriculeRecherche);
+			colleguesTrouve = collegueRepository.findByMatricule(matriculeRecherche);
 		} else {
 			throw new CollegueNonTrouveException("Le matricule ne peut être vide");
 		}
@@ -67,13 +67,15 @@ public class CollegueService {
 
 	}
 
-	public List<Collegue> rechercherTous() {
+	//
+	// public List<Collegue> rechercherTous() {
+	//
+	// return new ArrayList<>(data.values());
+	// }
 
-		return new ArrayList<>(data.values());
-
-	}
-
-	public Collegue ajouterUnCollegue(String nom, String prenom, String email, String photo) throws CollegueInvalideException {
+	@Transactional
+	public Collegue ajouterUnCollegue(String nom, String prenom, String email, String photo)
+			throws CollegueInvalideException {
 
 		Collegue collegueAAjouter = new Collegue();
 		collegueAAjouter.setEmail(email);
@@ -90,7 +92,8 @@ public class CollegueService {
 		collegueAAjouter.setMatricule(matricule);
 
 		// Sauvegarder le collègue
-		data.put(collegueAAjouter.getMatricule(), collegueAAjouter);
+		collegueRepository.save(collegueAAjouter);
+		// data.put(collegueAAjouter.getMatricule(), collegueAAjouter);
 
 		return collegueAAjouter;
 
@@ -104,7 +107,7 @@ public class CollegueService {
 			throw new CollegueNonTrouveException("Le matricule n'existe pas");
 		}
 		collegueEmailAModifier.setEmail(email);
-		data.put(collegueEmailAModifier.getMatricule(), collegueEmailAModifier);
+		// data.put(collegueEmailAModifier.getMatricule(), collegueEmailAModifier);
 
 		return collegueEmailAModifier;
 	}
@@ -119,7 +122,7 @@ public class CollegueService {
 
 		colleguePhotoAModifier.setPhotoUrl(photoUrl);
 
-		data.put(colleguePhotoAModifier.getMatricule(), colleguePhotoAModifier);
+		// data.put(colleguePhotoAModifier.getMatricule(), colleguePhotoAModifier);
 
 		return colleguePhotoAModifier;
 	}

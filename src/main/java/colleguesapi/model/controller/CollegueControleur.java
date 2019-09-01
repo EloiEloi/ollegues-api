@@ -32,11 +32,11 @@ public class CollegueControleur {
 
 	@Autowired
 	CollegueService c;
-
-	@RequestMapping(path = "/collegues", method = RequestMethod.GET)
-	public List<Collegue> findColleguesAll() {
-		return c.rechercherTous();
-	}
+	//
+	// @RequestMapping(path = "/collegues", method = RequestMethod.GET)
+	// public List<Collegue> findColleguesAll() {
+	// return c.rechercherTous();
+	// }
 
 	@RequestMapping(path = "/collegues/nom/{nom}", method = RequestMethod.GET)
 	public List<Collegue> findColleguesByName(@PathVariable String nom) throws CollegueNonTrouveException {
@@ -48,17 +48,16 @@ public class CollegueControleur {
 		return c.rechercherParMatricule(matricule);
 	}
 
-	@ExceptionHandler(CollegueNonTrouveException.class)
-	public ResponseEntity<String> handleConflict(CollegueNonTrouveException exception) {
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("MyResponseHeader", "MyValue");
-		String bodyOfResponse = exception.getMessage();
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bodyOfResponse);
+	@PostMapping("/collegues/creer")
+	public Collegue creerCollegue(@RequestParam String nom, @RequestParam String prenom, @RequestParam String email,
+			@RequestParam String photo) throws CollegueInvalideException {
+		return c.ajouterUnCollegue(nom, prenom, email, photo);
 	}
 
-	@PostMapping("/collegues/creer")
-	public Collegue creerCollegue(@RequestParam String nom, @RequestParam String prenom, @RequestParam String email, @RequestParam String photo) throws CollegueInvalideException {
-		return c.ajouterUnCollegue(nom, prenom, email, photo);
+	@PostMapping("/collegues/modifier")
+	public Collegue modifierEmail(@RequestParam String matricule, @RequestParam String email)
+			throws CollegueNonTrouveException {
+		return c.modifierEmail(matricule, email);
 	}
 
 	@ExceptionHandler(CollegueInvalideException.class)
@@ -69,8 +68,11 @@ public class CollegueControleur {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bodyOfResponse);
 	}
 
-	@PostMapping("/collegues/modifier")
-	public Collegue modifierEmail(@RequestParam String matricule, @RequestParam String email) throws CollegueNonTrouveException {
-		return c.modifierEmail(matricule, email);
+	@ExceptionHandler(CollegueNonTrouveException.class)
+	public ResponseEntity<String> handleConflict(CollegueNonTrouveException exception) {
+		HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.set("MyResponseHeader", "MyValue");
+		String bodyOfResponse = exception.getMessage();
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bodyOfResponse);
 	}
 }
